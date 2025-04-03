@@ -54,6 +54,17 @@ public class MessageProtocal {
         return gson.toJson(queryMap);
     }
 
+    public static String updateMeaningMessage(String word, String originalMeaning, String newMeaning){
+        Map<String, Object> queryMap = new HashMap<>();
+        queryMap.put("type", "update meaning");
+        queryMap.put("word", word);
+        queryMap.put("original meaning", originalMeaning);
+        queryMap.put("new meaning", newMeaning);
+
+        Gson gson = new Gson();
+        return gson.toJson(queryMap);
+    }
+
     public static Map<String, Object> readMessage(String json){
         Gson gson = new Gson();
         return gson.fromJson(json, Map.class);

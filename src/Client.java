@@ -70,6 +70,16 @@ public class Client {
                     message = MessageProtocal.addMeaningsMessage(word, newMeaning);
                     pr.println(message);
 
+                }else if(type.equals("update meaning")){
+                    System.out.print("Enter a word you want to update one of its meaning: ");
+                    String word = scanner.nextLine();
+                    System.out.print("Enter original meaning of the word: ");
+                    String originalMeaning = scanner.nextLine();
+                    System.out.print("Enter new meaning of the word: ");
+                    String newMeaning = scanner.nextLine();
+                    message = MessageProtocal.updateMeaningMessage(word, originalMeaning, newMeaning);
+                    pr.println(message);
+
                 }else{
                     System.out.println("unsupported functionality");
                     continue;
