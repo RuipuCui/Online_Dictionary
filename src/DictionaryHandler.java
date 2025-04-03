@@ -17,15 +17,13 @@ public class DictionaryHandler {
         Map<String, Object> jsonMap = MessageProtocal.readMessage(json);
         String type = (String) jsonMap.get("type");
 
-        if(type.equals("query")){
-            return queryHandler(jsonMap, dictionary);
-        }else if(type.equals("add")){
-            return addHandler(jsonMap, dictionary, dictFile);
-        }else if(type.equals("remove")){
-            return removeHandler(jsonMap, dictionary, dictFile);
-        }else{
-            return MessageProtocal.errorMessage("unsupported functionality");
-        }
+        return switch (type) {
+            case "query" -> queryHandler(jsonMap, dictionary);
+            case "add" -> addHandler(jsonMap, dictionary, dictFile);
+            case "remove" -> removeHandler(jsonMap, dictionary, dictFile);
+            case "add meaning" -> addMeaningHandler(jsonMap, dictionary, dictFile);
+            default -> MessageProtocal.errorMessage("unsupported functionality");
+        };
 
     }
 
@@ -83,5 +81,30 @@ public class DictionaryHandler {
             throw new RuntimeException("Failed to update dictionary file", e);
         }
     }
+
+    private static String addMeaningHandler(Map<String, Object> jsonMap, Map<String, List<String>> dictionary, String dictFile){
+        String word = (String) jsonMap.get("word");
+        if(!dictionary.containsKey(word)){
+            return MessageProtocal.errorMessage("the word does not exits");
+        }
+
+        String newMeaning = (String) jsonMap.get("meaning");
+        List<String> meanings = dictionary.get(word);
+        if(meanings.contains(newMeaning)){
+            return MessageProtocal.errorMessage("the meaning already exits");
+        }
+        meanings.add(newMeaning);
+
+        try (FileWriter writer = new FileWriter(dictFile)) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create(); // for readable output
+            gson.toJson(dictionary, writer);
+            return MessageProtocal.successMessage("new meaning added");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to update dictionary file", e);
+        }
+
+    }
+
+
 
 }

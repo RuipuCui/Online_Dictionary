@@ -62,6 +62,14 @@ public class Client {
                     message = MessageProtocal.removeMessage(word);
                     pr.println(message);
 
+                }else if(type.equals("add meaning")){
+                    System.out.print("Enter a word you want to add meaning to: ");
+                    String word = scanner.nextLine();
+                    System.out.print("Enter new meaning of the word: ");
+                    String newMeaning = scanner.nextLine();
+                    message = MessageProtocal.addMeaningsMessage(word, newMeaning);
+                    pr.println(message);
+
                 }else{
                     System.out.println("unsupported functionality");
                     continue;
