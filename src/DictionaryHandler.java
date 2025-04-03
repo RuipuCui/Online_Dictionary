@@ -120,12 +120,16 @@ public class DictionaryHandler {
         }
 
         int index = meanings.indexOf(originalMeaning);
-        meanings.set(index, newMeaning);
+        if(newMeaning.equals("")){
+            meanings.remove(index);
+        }else {
+            meanings.set(index, newMeaning);
+        }
 
         try (FileWriter writer = new FileWriter(dictFile)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create(); // for readable output
             gson.toJson(dictionary, writer);
-            return MessageProtocal.successMessage("new meaning added");
+            return MessageProtocal.successMessage("new meaning updated");
         } catch (IOException e) {
             throw new RuntimeException("Failed to update dictionary file", e);
         }

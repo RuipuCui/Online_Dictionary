@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Build/Build.iml" filepath="$PROJECT_DIR$/Build/Build.iml" />
       <module fileurl="file://$PROJECT_DIR$/Online_Dictionary.iml" filepath="$PROJECT_DIR$/Online_Dictionary.iml" />
     </modules>
   </component>
