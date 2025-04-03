@@ -1,0 +1,74 @@
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class MessageProtocal {
+
+    public static String queryMessage(String word){
+        Map<String, String> queryMap = new HashMap<>();
+        queryMap.put("type", "query");
+        queryMap.put("word", word);
+
+        Gson gson = new Gson();
+        return gson.toJson(queryMap);
+    }
+
+    public static String queryReply(List<String> meanings){
+        Gson gson = new Gson();
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.add("meanings", gson.toJsonTree(meanings));
+
+        return gson.toJson(jsonObject);
+    }
+
+    public static String addMessage(String word, List<String> meanings){
+        Map<String, Object> queryMap = new HashMap<>();
+        queryMap.put("type", "add");
+        queryMap.put("word", word);
+        queryMap.put("meanings", meanings);
+
+        Gson gson = new Gson();
+        return gson.toJson(queryMap);
+    }
+
+    public static String removeMessage(String word){
+        Map<String, Object> queryMap = new HashMap<>();
+        queryMap.put("type", "remove");
+        queryMap.put("word", word);
+
+        Gson gson = new Gson();
+        return gson.toJson(queryMap);
+    }
+
+    public static Map<String, Object> readMessage(String json){
+        Gson gson = new Gson();
+        return gson.fromJson(json, Map.class);
+    }
+
+    public static String errorMessage(String err){
+        Gson gson = new Gson();
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.add("error", gson.toJsonTree(err));
+
+        return gson.toJson(jsonObject);
+    }
+
+    public static String successMessage(String success){
+        Gson gson = new Gson();
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.add("success", gson.toJsonTree(success));
+
+        return gson.toJson(jsonObject);
+    }
+
+
+
+
+
+}
