@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 public class DictionaryClientUI extends JFrame {
     private CardLayout cardLayout;
@@ -144,22 +145,28 @@ public class DictionaryClientUI extends JFrame {
 
     private void handleConnect() {
         try {
-            int port = Integer.parseInt(portField.getText().trim());
+            String portText = portField.getText().trim();
+            if (portText.isEmpty()) throw new Exception("Port number cannot be empty.");
+            int port = Integer.parseInt(portText);
+            if (port < 1024 || port > 65535) throw new Exception("Port number must be between 1024 and 65535.");
+
             connection = new Client("localhost", port);
             JOptionPane.showMessageDialog(this, "Connected to port " + port);
             cardLayout.show(mainContainer, "functions");
-            setSize(800, 550); // 🟢 expand after connect
-            setLocationRelativeTo(null); // center on screen
+            setSize(800, 550);
+            setLocationRelativeTo(null);
 
-            // 🔁 Ensure "Query" is selected by default
             selectedFunction = "Query";
             updateGuide();
             functionButtons.values().forEach(b -> b.setBackground(Color.LIGHT_GRAY));
             functionButtons.get("Query").setBackground(Color.GRAY);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid port number. Please enter a valid number.");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Failed to connect: " + e.getMessage());
         }
     }
+
 
 
     private void updateGuide() {
@@ -201,34 +208,50 @@ public class DictionaryClientUI extends JFrame {
 
     private void handleStart() {
         String word = wordField.getText().trim();
+        if (word.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a word.");
+            return;
+        }
+
         try {
             String response = "";
             switch (selectedFunction) {
                 case "Query":
                     response = connection.query(word);
                     break;
+
                 case "Add":
-                    String[] addLines = inputArea1.getText().split("\\n");
-                    response = connection.add(word, Arrays.asList(addLines));
+                    String[] addLines = inputArea1.getText().trim().split("\\n");
+                    List<String> meanings = new ArrayList<>();
+                    for (String line : addLines) {
+                        if (!line.trim().isEmpty()) meanings.add(line.trim());
+                    }
+                    if (meanings.isEmpty()) throw new Exception("Please enter at least one meaning.");
+                    response = connection.add(word, meanings);
                     break;
+
                 case "Remove":
                     response = connection.remove(word);
                     break;
+
                 case "Add Meaning":
                     String meaning = inputArea1.getText().trim();
                     if (meaning.isEmpty()) throw new Exception("Please enter a new meaning.");
                     response = connection.addMeaning(word, meaning);
                     break;
+
                 case "Update Meaning":
                     String original = inputArea1.getText().trim();
                     String updated = inputArea2.getText().trim();
-                    if (original.isEmpty() || updated.isEmpty())
-                        throw new Exception("Both original and new meanings are required.");
+                    if (original.isEmpty()) throw new Exception("Original meaning cannot be empty.");
+                    if (updated.isEmpty()) throw new Exception("New meaning cannot be empty.");
                     response = connection.updateMeaning(word, original, updated);
                     break;
+
                 default:
                     response = "Invalid function.";
             }
+
             outputArea.setText(response);
             inputArea1.setText("");
             inputArea2.setText("");
@@ -236,6 +259,7 @@ public class DictionaryClientUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(DictionaryClientUI::new);
