@@ -15,7 +15,7 @@ public class Client {
 
     public String query(String word) throws IOException {
         writer.println(MessageProtocal.queryMessage(word));
-        return reader.readLine();
+        return MessageProtocal.getMeaningFromReply(reader.readLine());
     }
 
     public String add(String word, List<String> meanings) throws IOException {

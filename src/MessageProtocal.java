@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,13 @@ public class MessageProtocal {
         jsonObject.add("meanings", gson.toJsonTree(meanings));
 
         return gson.toJson(jsonObject);
+    }
+
+    public static String getMeaningFromReply(String queryReply){
+        Gson gson = new Gson();
+        Map<String, List<String>> map = gson.fromJson(queryReply, new TypeToken<Map<String, List<String>>>(){}.getType());
+        List<String> meanings = map.get("meanings");
+        return String.join("\n", meanings);
     }
 
     public static String addMessage(String word, List<String> meanings){
@@ -74,7 +82,7 @@ public class MessageProtocal {
         Gson gson = new Gson();
 
         JsonObject jsonObject = new JsonObject();
-        jsonObject.add("error", gson.toJsonTree(err));
+        jsonObject.add("ERROR", gson.toJsonTree(err));
 
         return gson.toJson(jsonObject);
     }
@@ -83,7 +91,7 @@ public class MessageProtocal {
         Gson gson = new Gson();
 
         JsonObject jsonObject = new JsonObject();
-        jsonObject.add("success", gson.toJsonTree(success));
+        jsonObject.add("SUCCESS", gson.toJsonTree(success));
 
         return gson.toJson(jsonObject);
     }

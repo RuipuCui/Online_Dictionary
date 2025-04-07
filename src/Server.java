@@ -1,66 +1,139 @@
-import java.net.*;
-import java.io.*;
-import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.*;
 
-public class Server {
-    private static final int MAX_THREADS = 10;
+public class Server extends JFrame {
+    private JTextField portField, fileField;
+    private JButton startButton;
+    private JTextArea logArea;
+
+    private ExecutorService pool;
+    private ServerSocket serverSocket;
+    private boolean isRunning = false;
+
+    public Server() {
+        setTitle("Dictionary Server");
+        setSize(600, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JPanel topPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        topPanel.add(new JLabel("Port:"));
+        portField = new JTextField("12345");
+        topPanel.add(portField);
+
+        topPanel.add(new JLabel("Dictionary File Path:"));
+        fileField = new JTextField("dictionary.json");
+        topPanel.add(fileField);
+
+        startButton = new JButton("Start Server");
+        topPanel.add(startButton);
+
+        JButton closeButton = new JButton("Close Server");
+        topPanel.add(closeButton);
+
+        closeButton.addActionListener(e -> stopServer());
+
+
+        startButton.addActionListener(this::startServer);
+
+        logArea = new JTextArea();
+        logArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(logArea);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Server Log"));
+
+        add(topPanel, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
+
+        setVisible(true);
+    }
+
+    private void startServer(ActionEvent e) {
+        if (isRunning) {
+            log("Server is already running.");
+            return;
+        }
+
+        int port;
+        try {
+            port = Integer.parseInt(portField.getText().trim());
+        } catch (NumberFormatException ex) {
+            log("Invalid port number.");
+            return;
+        }
+
+        String dictFile = fileField.getText().trim();
+        java.io.File file = new java.io.File(dictFile);
+        if (!file.exists() || !file.isFile()) {
+            log("Dictionary file not found: " + dictFile);
+            log("Please enter a valid file path and try again.");
+            return;
+        }
+
+        log("Dictionary file verified: " + dictFile);
+        log("Attempting to start server on port " + port + "...");
+
+        pool = Executors.newFixedThreadPool(10);
+
+
+        new Thread(() -> {
+            try {
+                serverSocket = new ServerSocket(port);
+                isRunning = true;
+                log("Server started successfully on port " + port);
+
+                while (true) {
+                    Socket clientSocket = serverSocket.accept();
+                    log("📡 Client connected: " + clientSocket.getInetAddress());
+                    pool.execute(new ClientHandler(clientSocket, port, dictFile, this::log));
+
+                }
+            } catch (IOException ex) {
+                log("Could not bind to port " + port + ": " + ex.getMessage());
+                isRunning = false;
+            }
+        }).start();
+    }
+
+
+    private void log(String msg) {
+        SwingUtilities.invokeLater(() -> {
+            logArea.append(msg + "\n");
+        });
+    }
 
     public static void main(String[] args) {
-//        InputStream in = null;
-//        OutputStream out = null;
-//        Socket socket = null;
-
-        final int PORT;
-        if (args.length < 2) {
-            System.out.println("java –jar DictionaryServer.jar <port> <dictionary-file>");
-        }
-
-        PORT = Integer.parseInt(args[0]);
-        String dictFile = args[1];
-
-        try (ExecutorService pool = Executors.newFixedThreadPool(MAX_THREADS);
-        ServerSocket serverSocket = new ServerSocket(PORT);)
-        {
-            System.out.println("Dictionary server running on port " + PORT);
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                pool.execute(new ClientHandler(clientSocket, PORT, dictFile));
-            }
-        }catch(IOException e) {
-            System.out.println("Could not bind to the port " + PORT);
-        }
-
-
-
-//        try (ServerSocket serverSocket = new ServerSocket(port)){
-//            socket = serverSocket.accept();
-//            System.out.println("Client connected");
-//            in = socket.getInputStream();
-//            out = socket.getOutputStream();
-//        } catch (IOException e) {
-//            System.out.println("Could not bind to the port " + port);
-//            System.exit(-1);
-//        }
-//
-//        try {
-//            BufferedReader bf = new BufferedReader(new InputStreamReader(in));
-//            PrintWriter pr = new PrintWriter(out, true);
-//
-//            while(true) {
-//                String str = bf.readLine();
-//                if(str == null){
-//                    System.out.println("Lost connection to port" + port);
-//                    break;
-//                }
-//
-//                String reply = DictionaryHandler.Handler(str, dictFile);
-//                System.out.println("Received from client: " + str);
-//                pr.println(reply);
-//            }
-//        } catch (IOException e) {
-//            System.out.println("Lost connection to port " + port);
-//        }
+        SwingUtilities.invokeLater(Server::new);
     }
+
+    private void stopServer() {
+        if (!isRunning) {
+            log("Server is not running.");
+            return;
+        }
+
+        try {
+            log("Shutting down server...");
+
+            if (pool != null) {
+                pool.shutdownNow();
+            }
+
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+
+            isRunning = false;
+            log("Server has been stopped.");
+        } catch (IOException e) {
+            log("Error while stopping server: " + e.getMessage());
+        }
+    }
+
 }

@@ -255,10 +255,35 @@ public class DictionaryClientUI extends JFrame {
             outputArea.setText(response);
             inputArea1.setText("");
             inputArea2.setText("");
+        } catch (IOException ioe) {
+            showReconnectDialog();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
+
+    private void showReconnectDialog() {
+        int choice = JOptionPane.showOptionDialog(
+                this,
+                "The connection to the server was lost.",
+                "Disconnected",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                new String[]{"Reconnect"},
+                "Reconnect"
+        );
+
+        if (choice == 0) { // user clicked "Reconnect"
+            try {
+                connection.close();
+            } catch (IOException ignored) {}
+            cardLayout.show(mainContainer, "connect");
+            setSize(400, 300);
+            setLocationRelativeTo(null);
+        }
+    }
+
 
 
     public static void main(String[] args) {

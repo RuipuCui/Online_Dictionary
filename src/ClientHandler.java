@@ -8,11 +8,16 @@ public class ClientHandler implements Runnable{
 
     private final String dictFile;
 
-    public ClientHandler(Socket socket, int port, String dictFile){
+    private final java.util.function.Consumer<String> logger; // <-- log callback
+
+
+    public ClientHandler(Socket socket, int port, String dictFile, java.util.function.Consumer<String> logger){
         this.socket = socket;
         this.port = port;
         this.dictFile = dictFile;
+        this.logger = logger;
     }
+
 
     public void run(){
         try(BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -21,12 +26,12 @@ public class ClientHandler implements Runnable{
             while(true) {
                 String str = in.readLine();
                 if(str == null){
-                    System.out.println("Lost connection to port" + port);
+                    logger.accept("⚠️ Lost connection to port " + port);
                     break;
                 }
 
                 String reply = DictionaryHandler.Handler(str, dictFile);
-                System.out.println("Received from client: " + str);
+                logger.accept("📥 Received from client: " + str);
                 out.println(reply);
             }
 
