@@ -27,11 +27,10 @@ public class MessageProtocal {
     }
 
     public static String getMeaningFromReply(String queryReply){
-        Gson gson = new Gson();
-        Map<String, String> map = gson.fromJson(queryReply, new TypeToken<Map<String, String>>(){}.getType());
-        if(map.containsKey("ERROR")){
-            return map.get("ERROR");
+        if(queryReply.contains("ERROR")){
+            return queryReply;
         }
+        Gson gson = new Gson();
         Map<String, List<String>> meaningMap = gson.fromJson(queryReply, new TypeToken<Map<String, List<String>>>(){}.getType());
         List<String> meanings = meaningMap.get("meanings");
         return String.join("\n", meanings);

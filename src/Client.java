@@ -15,10 +15,10 @@ public class Client {
 
     public String query(String word) throws IOException {
         writer.println(MessageProtocal.queryMessage(word));
-        String reply = reader.readLine();
+        //String reply = reader.readLine();
 
-        //return MessageProtocal.getMeaningFromReply(reader.readLine());
-        return reply;
+        return MessageProtocal.getMeaningFromReply(reader.readLine());
+        //return reply;
     }
 
     public String add(String word, List<String> meanings) throws IOException {
