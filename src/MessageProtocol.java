@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MessageProtocal {
+public class MessageProtocol {
 
     public static String queryMessage(String word){
         Map<String, String> queryMap = new HashMap<>();
@@ -76,7 +76,7 @@ public class MessageProtocal {
         return gson.toJson(queryMap);
     }
 
-    public static Map<String, Object> readMessage(String json){
+    public static Map<String, Object> processJsonMessage(String json){
         Gson gson = new Gson();
         return gson.fromJson(json, Map.class);
     }

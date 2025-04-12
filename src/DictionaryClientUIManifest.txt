@@ -1,2 +1,3 @@
-Main-Class: Client
+Main-Class: DictionaryClientUI
 Class-Path: lib/gson-2.12.1.jar
+

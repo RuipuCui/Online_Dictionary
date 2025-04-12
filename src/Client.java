@@ -14,31 +14,54 @@ public class Client {
     }
 
     public String query(String word) throws IOException {
-        writer.println(MessageProtocal.queryMessage(word));
-        //String reply = reader.readLine();
+        writer.println(MessageProtocol.queryMessage(word));
+        String reply = reader.readLine();
 
-        return MessageProtocal.getMeaningFromReply(reader.readLine());
-        //return reply;
+        if (reply == null) {
+            throw new IOException("Server disconnected or returned no data.");
+        }
+
+        return MessageProtocol.getMeaningFromReply(reply);
     }
 
+
     public String add(String word, List<String> meanings) throws IOException {
-        writer.println(MessageProtocal.addMessage(word, meanings));
-        return reader.readLine();
+        writer.println(MessageProtocol.addMessage(word, meanings));
+        String reply = reader.readLine();
+        if (reply == null) {
+            throw new IOException("Server disconnected or returned no data.");
+        }
+
+        return reply;
     }
 
     public String remove(String word) throws IOException {
-        writer.println(MessageProtocal.removeMessage(word));
-        return reader.readLine();
+        writer.println(MessageProtocol.removeMessage(word));
+        String reply = reader.readLine();
+        if (reply == null) {
+            throw new IOException("Server disconnected or returned no data.");
+        }
+
+        return reply;
     }
 
     public String addMeaning(String word, String newMeaning) throws IOException {
-        writer.println(MessageProtocal.addMeaningsMessage(word, newMeaning));
-        return reader.readLine();
+        writer.println(MessageProtocol.addMeaningsMessage(word, newMeaning));
+        String reply = reader.readLine();
+        if (reply == null) {
+            throw new IOException("Server disconnected or returned no data.");
+        }
+
+        return reply;
     }
 
     public String updateMeaning(String word, String oldMeaning, String newMeaning) throws IOException {
-        writer.println(MessageProtocal.updateMeaningMessage(word, oldMeaning, newMeaning));
-        return reader.readLine();
+        writer.println(MessageProtocol.updateMeaningMessage(word, oldMeaning, newMeaning));
+        String reply = reader.readLine();
+        if (reply == null) {
+            throw new IOException("Server disconnected or returned no data.");
+        }
+        return reply;
     }
 
     public void close() throws IOException {

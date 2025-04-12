@@ -14,7 +14,7 @@ public class DictionaryHandler {
         Map<String, List<String>> dictionary = readDictionary(dictFile);
 
         //convert the json message from the client into map data structure
-        Map<String, Object> jsonMap = MessageProtocal.readMessage(json);
+        Map<String, Object> jsonMap = MessageProtocol.processJsonMessage(json);
         String type = (String) jsonMap.get("type");
 
         return switch (type) {
@@ -23,7 +23,7 @@ public class DictionaryHandler {
             case "remove" -> removeHandler(jsonMap, dictionary, dictFile);
             case "add meaning" -> addMeaningHandler(jsonMap, dictionary, dictFile);
             case "update meaning" -> updateMeaningHandler(jsonMap, dictionary, dictFile);
-            default -> MessageProtocal.errorMessage("unsupported functionality");
+            default -> MessageProtocol.errorMessage("unsupported functionality");
         };
 
     }
@@ -42,16 +42,16 @@ public class DictionaryHandler {
         String word = (String) jsonMap.get("word");
         List<String> meanings = dictionary.get(word);
         if(meanings == null){
-            return MessageProtocal.errorMessage("the word does not exit");
+            return MessageProtocol.errorMessage("the word does not exit");
         }
 
-        return MessageProtocal.queryReply(meanings);
+        return MessageProtocol.queryReply(meanings);
     }
 
     private static String addHandler(Map<String, Object> jsonMap, Map<String, List<String>> dictionary, String dictFile){
         String word = (String) jsonMap.get("word");
         if(dictionary.containsKey(word)){
-            return MessageProtocal.errorMessage("the word already exits");
+            return MessageProtocol.errorMessage("the word already exits");
         }
         List<String> meanings = (List<String>) jsonMap.get("meanings");
         dictionary.put(word, meanings);
@@ -59,7 +59,7 @@ public class DictionaryHandler {
         try (FileWriter writer = new FileWriter(dictFile)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create(); // for readable output
             gson.toJson(dictionary, writer);
-            return MessageProtocal.successMessage("new word added");
+            return MessageProtocol.successMessage("new word added");
         } catch (IOException e) {
             throw new RuntimeException("Failed to update dictionary file", e);
         }
@@ -69,7 +69,7 @@ public class DictionaryHandler {
     private static String removeHandler(Map<String, Object> jsonMap, Map<String, List<String>> dictionary, String dictFile){
         String word = (String) jsonMap.get("word");
         if(!dictionary.containsKey(word)){
-            return MessageProtocal.errorMessage("the word does not exit or already removed");
+            return MessageProtocol.errorMessage("the word does not exit or already removed");
         }
 
         dictionary.remove(word);
@@ -77,7 +77,7 @@ public class DictionaryHandler {
         try (FileWriter writer = new FileWriter(dictFile)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create(); // for readable output
             gson.toJson(dictionary, writer);
-            return MessageProtocal.successMessage("word removed");
+            return MessageProtocol.successMessage("word removed");
         } catch (IOException e) {
             throw new RuntimeException("Failed to update dictionary file", e);
         }
@@ -86,20 +86,20 @@ public class DictionaryHandler {
     private static String addMeaningHandler(Map<String, Object> jsonMap, Map<String, List<String>> dictionary, String dictFile){
         String word = (String) jsonMap.get("word");
         if(!dictionary.containsKey(word)){
-            return MessageProtocal.errorMessage("the word does not exits");
+            return MessageProtocol.errorMessage("the word does not exits");
         }
 
         String newMeaning = (String) jsonMap.get("meaning");
         List<String> meanings = dictionary.get(word);
         if(meanings.contains(newMeaning)){
-            return MessageProtocal.errorMessage("the meaning already exits");
+            return MessageProtocol.errorMessage("the meaning already exits");
         }
         meanings.add(newMeaning);
 
         try (FileWriter writer = new FileWriter(dictFile)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create(); // for readable output
             gson.toJson(dictionary, writer);
-            return MessageProtocal.successMessage("new meaning added");
+            return MessageProtocol.successMessage("new meaning added");
         } catch (IOException e) {
             throw new RuntimeException("Failed to update dictionary file", e);
         }
@@ -109,14 +109,14 @@ public class DictionaryHandler {
     private static String updateMeaningHandler(Map<String, Object> jsonMap, Map<String, List<String>> dictionary, String dictFile){
         String word = (String) jsonMap.get("word");
         if(!dictionary.containsKey(word)){
-            return MessageProtocal.errorMessage("the word does not exits");
+            return MessageProtocol.errorMessage("the word does not exits");
         }
 
         String originalMeaning = (String) jsonMap.get("original meaning");
         String newMeaning = (String) jsonMap.get("new meaning");
         List<String> meanings = dictionary.get(word);
         if(!meanings.contains(originalMeaning)){
-            return MessageProtocal.errorMessage("the meaning does not exits");
+            return MessageProtocol.errorMessage("the meaning does not exits");
         }
 
         int index = meanings.indexOf(originalMeaning);
@@ -129,7 +129,7 @@ public class DictionaryHandler {
         try (FileWriter writer = new FileWriter(dictFile)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create(); // for readable output
             gson.toJson(dictionary, writer);
-            return MessageProtocal.successMessage("new meaning updated");
+            return MessageProtocol.successMessage("new meaning updated");
         } catch (IOException e) {
             throw new RuntimeException("Failed to update dictionary file", e);
         }
