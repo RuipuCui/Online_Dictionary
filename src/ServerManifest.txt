@@ -1,2 +1,2 @@
-Main-Class: Server
+Main-Class: DictionaryServer
 Class-Path: lib/gson-2.12.1.jar

@@ -2,12 +2,12 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class Client {
+public class ClientHelper {
     private Socket socket;
     private PrintWriter writer;
     private BufferedReader reader;
 
-    public Client(String host, int port) throws IOException {
+    public ClientHelper(String host, int port) throws IOException {
         socket = new Socket(host, port);
         writer = new PrintWriter(socket.getOutputStream(), true);
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));

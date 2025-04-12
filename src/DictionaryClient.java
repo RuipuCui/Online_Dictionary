@@ -1,11 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
-public class DictionaryClientUI extends JFrame {
+public class DictionaryClient extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainContainer;
 
@@ -22,9 +21,9 @@ public class DictionaryClientUI extends JFrame {
     private String selectedFunction = "Query";
 
     private Map<String, JButton> functionButtons = new HashMap<>();
-    private Client connection;
+    private ClientHelper connection;
 
-    public DictionaryClientUI() {
+    public DictionaryClient() {
         setTitle("Online Dictionary");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -150,7 +149,7 @@ public class DictionaryClientUI extends JFrame {
             int port = Integer.parseInt(portText);
             if (port < 1024 || port > 65535) throw new Exception("Port number must be between 1024 and 65535.");
 
-            connection = new Client("localhost", port);
+            connection = new ClientHelper("localhost", port);
             JOptionPane.showMessageDialog(this, "Connected to port " + port);
             cardLayout.show(mainContainer, "functions");
             setSize(800, 550);
@@ -287,7 +286,7 @@ public class DictionaryClientUI extends JFrame {
 
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(DictionaryClientUI::new);
+        SwingUtilities.invokeLater(DictionaryClient::new);
     }
 }
 

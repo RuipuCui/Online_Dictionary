@@ -6,7 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.*;
 
-public class Server extends JFrame {
+public class DictionaryServer extends JFrame {
     private JTextField portField, fileField;
     private JButton startButton;
     private JTextArea logArea;
@@ -15,7 +15,7 @@ public class Server extends JFrame {
     private ServerSocket serverSocket;
     private boolean isRunning = false;
 
-    public Server() {
+    public DictionaryServer() {
         setTitle("Dictionary Server");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -109,7 +109,7 @@ public class Server extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(Server::new);
+        SwingUtilities.invokeLater(DictionaryServer::new);
     }
 
     private void stopServer() {
